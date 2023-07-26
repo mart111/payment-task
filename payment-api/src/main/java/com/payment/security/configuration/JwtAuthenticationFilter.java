@@ -1,5 +1,6 @@
 package com.payment.security.configuration;
 
+import com.payment.exception.AuthenticationTokenNotValidException;
 import com.payment.model.User;
 import com.payment.security.service.JwtService;
 import jakarta.servlet.FilterChain;
@@ -41,22 +42,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        final var token = header.replace(header, BEARER);
+        final var token = header.replace(BEARER, "");
         if (!hasText(token)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        final var username = jwtService.extractUsername(token);
-        final var user = ((User) userDetailsService.loadUserByUsername(username));
-        if (!jwtService.isTokenValid(user, token)) {
-            filterChain.doFilter(request, response);
+        try {
+            final var username = jwtService.extractUsername(token);
+            final var user = ((User) userDetailsService.loadUserByUsername(username));
+            if (!jwtService.isTokenValid(user, token)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            final var authentication = new UsernamePasswordAuthenticationToken(username, null, user.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext()
+                    .setAuthentication(authentication);
+        } catch (AuthenticationTokenNotValidException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
-        final var authentication = new UsernamePasswordAuthenticationToken(username, null, user.getAuthorities());
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext()
-                .setAuthentication(authentication);
         filterChain.doFilter(request, response);
     }
 }
