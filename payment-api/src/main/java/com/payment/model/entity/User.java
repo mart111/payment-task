@@ -1,5 +1,7 @@
-package com.payment.model;
+package com.payment.model.entity;
 
+import com.payment.model.Role;
+import com.payment.model.Status;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;

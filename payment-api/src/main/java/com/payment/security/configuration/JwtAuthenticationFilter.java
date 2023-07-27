@@ -1,7 +1,7 @@
 package com.payment.security.configuration;
 
 import com.payment.exception.AuthenticationTokenNotValidException;
-import com.payment.model.User;
+import com.payment.model.entity.User;
 import com.payment.security.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

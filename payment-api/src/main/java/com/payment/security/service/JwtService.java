@@ -3,7 +3,7 @@ package com.payment.security.service;
 import com.payment.exception.AuthenticationTokenNotValidException;
 import com.payment.exception.TokenGenerationException;
 import com.payment.model.AuthenticationToken;
-import com.payment.model.User;
+import com.payment.model.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

@@ -1,4 +1,4 @@
-package com.payment.model;
+package com.payment.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;

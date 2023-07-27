@@ -1,9 +1,9 @@
 package com.payment.service;
 
 import com.payment.exception.DuplicateUsernameException;
-import com.payment.model.Merchant;
 import com.payment.model.Status;
-import com.payment.model.User;
+import com.payment.model.entity.Merchant;
+import com.payment.model.entity.User;
 import com.payment.model.request.UserRegistrationRequest;
 import com.payment.model.response.UserRegistrationResponse;
 import com.payment.repository.UserRepository;

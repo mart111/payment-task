@@ -1,6 +1,6 @@
 package com.payment.service;
 
-import com.payment.model.User;
+import com.payment.model.entity.User;
 import com.payment.model.request.LoginRequest;
 import com.payment.model.response.LoginResponse;
 import com.payment.security.service.JwtService;
