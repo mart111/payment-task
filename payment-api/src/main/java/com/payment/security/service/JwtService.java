@@ -33,10 +33,6 @@ public class JwtService {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
-    public boolean validateToken(String token) {
-        return true;
-    }
-
     public String extractUsername(String token) {
         return getClaims(token).getSubject();
     }
@@ -46,13 +42,7 @@ public class JwtService {
                 .plus(1,
                         ChronoUnit.HOURS));
 
-        return Optional.of(Jwts.builder()
-                        .setSubject(user.getUsername())
-                        .addClaims(Map.of(ROLE, user.getAuthorities()))
-                        .setIssuedAt(new Date())
-                        .setExpiration(expiresIn)
-                        .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                        .compact())
+        return Optional.of(createToken(user, expiresIn))
                 .map(token -> new AuthenticationToken(token, expiresIn))
                 .orElseThrow(() -> {
                     throw new TokenGenerationException(String.format(
@@ -60,6 +50,16 @@ public class JwtService {
                             user.getUsername()
                     ));
                 });
+    }
+
+    private String createToken(User user, Date expiresIn) {
+        return Jwts.builder()
+                .setSubject(user.getUsername())
+                .addClaims(Map.of(ROLE, user.getAuthorities()))
+                .setIssuedAt(new Date())
+                .setExpiration(expiresIn)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public boolean isTokenValid(User user, String token) {
