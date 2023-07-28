@@ -1,16 +1,12 @@
 package com.payment.model.entity;
 
 import com.payment.model.TransactionStatus;
-import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.PrimaryKeyJoinColumn;
 
 @Entity
-@PrimaryKeyJoinColumn(name = "transaction_id")
+@DiscriminatorValue("CHARGE")
 public class ChargeTransaction extends Transaction {
-
-    @Column(name = "reference_id")
-    protected String referenceId;
 
     @Override
     protected void setStatus() {

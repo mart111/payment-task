@@ -33,6 +33,7 @@ public class User implements UserDetails {
     @Getter(AccessLevel.NONE)
     protected String password;
 
+    @Enumerated(EnumType.STRING)
     protected Status status;
 
     @Enumerated(EnumType.STRING)

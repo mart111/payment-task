@@ -7,11 +7,13 @@ import lombok.Data;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Data
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "transaction_type")
 public abstract class Transaction {
 
     @Id
@@ -32,6 +34,12 @@ public abstract class Transaction {
 
     @Column(name = "customer_phone")
     protected String customerPhone;
+
+    @Column(name = "creation_date")
+    private Instant createdAt;
+
+    @Column(name = "reference_id")
+    protected String referenceId;
 
     public Transaction() {
         setStatus();

@@ -1,18 +1,15 @@
 package com.payment.model.entity;
 
 import com.payment.model.TransactionStatus;
-import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.Data;
 
 @Entity
-@PrimaryKeyJoinColumn(name = "transaction_id")
 @Data
+@DiscriminatorValue("REFUND")
 public class RefundTransaction extends Transaction {
 
-    @Column(name = "reference_id")
-    protected String referenceId;
 
     @Override
     protected void setStatus() {
