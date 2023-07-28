@@ -42,7 +42,7 @@ public class JwtService {
                 .plus(1,
                         ChronoUnit.HOURS));
 
-        return Optional.of(createToken(user, expiresIn))
+        return Optional.ofNullable(createToken(user, expiresIn))
                 .map(token -> new AuthenticationToken(token, expiresIn))
                 .orElseThrow(() -> {
                     throw new TokenGenerationException(String.format(
