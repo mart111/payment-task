@@ -1,5 +1,6 @@
 package com.payment.service;
 
+import com.payment.exception.MerchantNotEligibleForRemovalException;
 import com.payment.model.entity.Merchant;
 import com.payment.model.entity.User;
 import com.payment.model.request.MerchantEditRequest;
@@ -8,6 +9,7 @@ import com.payment.model.response.MerchantResponse;
 import com.payment.repository.MerchantRepository;
 import com.payment.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class MerchantService {
 
     private final MerchantRepository merchantRepository;
     private final UserRepository userRepository;
+    private final PaymentTransactionService paymentTransactionService;
 
     public MerchantListResponse getAllMerchants() {
         return Optional.of(merchantRepository.findAll())
@@ -36,6 +39,18 @@ public class MerchantService {
                 .map(actualUser -> updateUser(actualUser, merchantEditRequest))
                 .map(this::convertToMerchantResponse)
                 .orElse(null);
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ,
+            rollbackFor = Exception.class)
+    void delete(Long merchantId) {
+        merchantRepository.findById(merchantId)
+                .map(Merchant::getTransactions)
+                .filter(CollectionUtils::isEmpty)
+                .ifPresentOrElse(__ -> merchantRepository.deleteById(merchantId),
+                        () -> {
+                            throw new MerchantNotEligibleForRemovalException("Merchant has transaction history.");
+                        });
     }
 
     public boolean usernameAlreadyExists(String username) {

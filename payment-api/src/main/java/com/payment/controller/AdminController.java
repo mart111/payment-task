@@ -51,7 +51,7 @@ public class AdminController {
     }
 
     @PutMapping("/{merchantId}")
-    public ResponseEntity<?> updateMerchant(@PathVariable long merchantId,
+    public ResponseEntity<?> updateMerchant(@PathVariable Long merchantId,
                                             @RequestBody @Valid MerchantEditRequest merchantEditRequest) {
         final var merchantResponse = adminService.updateMerchant(merchantId, merchantEditRequest);
         return nonNull(merchantResponse) ?
@@ -59,5 +59,12 @@ public class AdminController {
                 ResponseEntity.badRequest()
                         .body(withError(String.format("Failed to update merchant with email '%s'",
                                 merchantEditRequest.username())));
+    }
+
+    @DeleteMapping(value = "/{merchantId}")
+    public ResponseEntity<?> deleteMerchant(@PathVariable Long merchantId) {
+        adminService.deleteMerchant(merchantId);
+        return ResponseEntity.noContent()
+                .build();
     }
 }

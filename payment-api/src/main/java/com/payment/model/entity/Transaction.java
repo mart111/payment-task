@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
@@ -30,7 +31,7 @@ public abstract class Transaction {
     @Column(name = "transaction_number", nullable = false)
     @UuidGenerator
     protected UUID transactionNumber; // acts like id. The purpose of this field is,
-                                     // prevention of exposing actual transaction_id.
+    // prevention of exposing actual transaction_id.
 
     protected BigDecimal amount;
 
@@ -50,6 +51,17 @@ public abstract class Transaction {
 
     @Column(name = "reference_id")
     protected String referenceId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinTable(name = "merchant_transaction",
+            joinColumns = @JoinColumn(name = "transaction_id",
+                    referencedColumnName = "transaction_id",
+                    insertable = false, updatable = false),
+            inverseJoinColumns = @JoinColumn(name = "user_id",
+                    referencedColumnName = "id",
+                    insertable = false, updatable = false))
+    @ToString.Exclude
+    protected Merchant merchant;
 
     public Transaction() {
         this.createdAt = Instant.now();

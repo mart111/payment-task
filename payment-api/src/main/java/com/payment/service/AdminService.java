@@ -43,4 +43,10 @@ public class AdminService {
     public MerchantResponse updateMerchant(Long merchantId, MerchantEditRequest merchantEditRequest) {
         return merchantService.updateMerchant(merchantId, merchantEditRequest);
     }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ,
+            rollbackFor = Exception.class)
+    public void deleteMerchant(Long merchantId) {
+        merchantService.delete(merchantId);
+    }
 }
