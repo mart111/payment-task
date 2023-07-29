@@ -8,6 +8,7 @@ import com.payment.service.MerchantService;
 import com.payment.service.PaymentTransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,7 @@ public class AdminController {
 
     @GetMapping("transactions")
     public ResponseEntity<?> getAllTransactionsOfMerchant(@RequestParam String merchantEmail) {
+
         return hasText(merchantEmail) ?
                 ResponseEntity.ok(paymentTransactionService.getAllTransactionsOfMerchant(merchantEmail)) :
                 ResponseEntity.badRequest()
@@ -45,15 +47,22 @@ public class AdminController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> importMerchants(@RequestParam("file") MultipartFile csvFile) throws IOException {
+
         final var fileAsBytes = csvFile.getBytes();
-        return fileAsBytes.length > 0 ? ResponseEntity.ok(adminService.importFromCsv(fileAsBytes))
-                : ResponseEntity.badRequest().body(withError("Provided CSV file is empty."));
+        final var contentType = csvFile.getContentType();
+
+        return fileAsBytes.length > 0 && hasText(contentType) && contentType.equals("text/csv") ?
+                ResponseEntity.status(HttpStatus.CREATED)
+                        .body(adminService.importFromCsv(fileAsBytes)) :
+                ResponseEntity.badRequest()
+                        .body(withError("Provided CSV file is empty or is not a valid CSV file."));
     }
 
     @PutMapping("/{merchantId}")
     public ResponseEntity<?> updateMerchant(@PathVariable Long merchantId,
                                             @RequestBody @Valid MerchantEditRequest merchantEditRequest) {
         final var merchantResponse = adminService.updateMerchant(merchantId, merchantEditRequest);
+
         return nonNull(merchantResponse) ?
                 ResponseEntity.ok(merchantResponse) :
                 ResponseEntity.badRequest()
@@ -63,6 +72,7 @@ public class AdminController {
 
     @DeleteMapping(value = "/{merchantId}")
     public ResponseEntity<?> deleteMerchant(@PathVariable Long merchantId) {
+
         adminService.deleteMerchant(merchantId);
         return ResponseEntity.noContent()
                 .build();
