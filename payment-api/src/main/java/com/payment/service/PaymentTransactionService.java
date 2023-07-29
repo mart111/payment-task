@@ -7,7 +7,10 @@ import com.payment.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +19,15 @@ import java.util.Optional;
 public class PaymentTransactionService {
 
     private final TransactionRepository transactionRepository;
+
+    @Transactional(rollbackFor = Exception.class,
+            isolation = Isolation.REPEATABLE_READ)
+    public List<Transaction> removeTransactionsOlderThan(Instant instant) {
+        return this.transactionRepository
+                .deleteByCreatedAtBefore(instant)
+                .filter(transactions -> !transactions.isEmpty())
+                .orElse(List.of());
+    }
 
     public TransactionListResponse getAllTransactionsOfMerchant(String merchantEmail) {
         return Optional.of(transactionRepository.findAllByCustomerEmailOrderByCreatedAtAsc(merchantEmail))

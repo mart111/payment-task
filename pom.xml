@@ -18,6 +18,7 @@
         <java.version>17</java.version>
         <JJWT_RELEASE_VERSION>0.11.5</JJWT_RELEASE_VERSION>
         <opencsv.version>5.8</opencsv.version>
+        <awaitility.version>4.2.0</awaitility.version>
     </properties>
 
     <modules>
@@ -48,6 +49,12 @@
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
                 <version>${opencsv.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

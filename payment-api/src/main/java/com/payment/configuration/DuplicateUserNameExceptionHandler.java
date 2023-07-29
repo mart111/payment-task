@@ -14,7 +14,7 @@ public class DuplicateUserNameExceptionHandler {
 
     @ExceptionHandler(DuplicateUsernameException.class)
     public ResponseEntity<Map<String, String>> duplicateUsernameHandler(DuplicateUsernameException e) {
-        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED)
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("username", e.getMessage()));
     }
 }
