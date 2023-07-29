@@ -33,6 +33,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/index").permitAll()
                         .requestMatchers("/api/v1/register").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/v1/merchant/**").hasRole( "merchant")
+                        .requestMatchers("/api/v1/merchants/**").hasRole("admin")
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(sessionManagementConfigurer ->

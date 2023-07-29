@@ -1,6 +1,8 @@
 package com.payment.controller;
 
 import com.payment.model.GenericErrorResponse;
+import com.payment.model.response.MerchantListResponse;
+import com.payment.service.MerchantService;
 import com.payment.service.PaymentTransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +16,21 @@ import static org.springframework.util.StringUtils.hasText;
 @RestController
 @RequestMapping("/api/v1/merchants")
 @RequiredArgsConstructor
-public class PaymentController {
+public class AdminController {
 
     private final PaymentTransactionService paymentTransactionService;
+    private final MerchantService merchantService;
+
+    @GetMapping
+    public ResponseEntity<MerchantListResponse> fetchAllMerchants() {
+        return ResponseEntity.ok(merchantService.getAllMerchants());
+    }
 
     @GetMapping("transactions")
-    public ResponseEntity<?> getAllTransactions(@RequestParam String merchantEmail) {
+    public ResponseEntity<?> getAllTransactionsOfMerchant(@RequestParam String merchantEmail) {
         return hasText(merchantEmail) ?
-                ResponseEntity.ok(paymentTransactionService.getAllTransactions(merchantEmail)) :
+                ResponseEntity.ok(paymentTransactionService.getAllTransactionsOfMerchant(merchantEmail)) :
                 ResponseEntity.badRequest()
-                        .body(GenericErrorResponse.withError("Merchant email should be provided"));
-
-
+                        .body(GenericErrorResponse.withError("Merchant's email should be provided."));
     }
 }

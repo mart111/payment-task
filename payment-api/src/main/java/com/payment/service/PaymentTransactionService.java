@@ -5,6 +5,7 @@ import com.payment.model.response.TransactionListResponse;
 import com.payment.model.response.TransactionResponse;
 import com.payment.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,11 +17,19 @@ public class PaymentTransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    public TransactionListResponse getAllTransactions(String merchantEmail) {
+    public TransactionListResponse getAllTransactionsOfMerchant(String merchantEmail) {
         return Optional.of(transactionRepository.findAllByCustomerEmailOrderByCreatedAtAsc(merchantEmail))
                 .filter(txs -> !txs.isEmpty())
                 .map(this::convertToListResponse)
                 .orElse(TransactionListResponse.EMPTY);
+    }
+
+    public TransactionListResponse getMerchantTransactions() {
+        return getAllTransactionsOfMerchant(
+                SecurityContextHolder.getContext()
+                        .getAuthentication()
+                        .getName()
+        );
     }
 
     private TransactionListResponse convertToListResponse(List<Transaction> transactions) {
