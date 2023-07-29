@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import static com.payment.model.GenericErrorResponse.withError;
 import static java.util.Objects.nonNull;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -38,7 +37,7 @@ public class AdminController {
     public ResponseEntity<?> getAllTransactionsOfMerchant(@RequestParam String merchantEmail) {
 
         return hasText(merchantEmail) ?
-                ResponseEntity.ok(paymentTransactionService.getAllTransactionsOfMerchant(merchantEmail)) :
+                ResponseEntity.ok(paymentTransactionService.findAllTransactions(merchantEmail)) :
                 ResponseEntity.badRequest()
                         .body(GenericErrorResponse.withError("Merchant's email should be provided."));
     }
@@ -55,7 +54,7 @@ public class AdminController {
                 ResponseEntity.status(HttpStatus.CREATED)
                         .body(adminService.importFromCsv(fileAsBytes)) :
                 ResponseEntity.badRequest()
-                        .body(withError("Provided CSV file is empty or is not a valid CSV file."));
+                        .body(GenericErrorResponse.withError("Provided CSV file is empty or is not a valid CSV file."));
     }
 
     @PutMapping("/{merchantId}")
@@ -66,7 +65,7 @@ public class AdminController {
         return nonNull(merchantResponse) ?
                 ResponseEntity.ok(merchantResponse) :
                 ResponseEntity.badRequest()
-                        .body(withError(String.format("Failed to update merchant with email '%s'",
+                        .body(GenericErrorResponse.withError(String.format("Failed to update merchant with email '%s'",
                                 merchantEditRequest.username())));
     }
 

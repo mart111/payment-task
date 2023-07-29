@@ -1,8 +1,10 @@
 package com.payment.service;
 
+import com.payment.model.entity.Merchant;
 import com.payment.model.entity.Transaction;
 import com.payment.model.response.TransactionListResponse;
 import com.payment.model.response.TransactionResponse;
+import com.payment.repository.MerchantRepository;
 import com.payment.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class PaymentTransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final MerchantRepository merchantRepository;
 
     @Transactional(rollbackFor = Exception.class,
             isolation = Isolation.REPEATABLE_READ)
@@ -29,15 +31,15 @@ public class PaymentTransactionService {
                 .orElse(List.of());
     }
 
-    public TransactionListResponse getAllTransactionsOfMerchant(String merchantEmail) {
-        return Optional.of(transactionRepository.findAllByCustomerEmailOrderByCreatedAtAsc(merchantEmail))
-                .filter(txs -> !txs.isEmpty())
+    public TransactionListResponse findAllTransactions(String merchantEmail) {
+        return merchantRepository.findMerchantByEmail(merchantEmail)
+                .map(Merchant::getTransactions)
                 .map(this::convertToListResponse)
                 .orElse(TransactionListResponse.EMPTY);
     }
 
     public TransactionListResponse getMerchantTransactions() {
-        return getAllTransactionsOfMerchant(
+        return findAllTransactions(
                 SecurityContextHolder.getContext()
                         .getAuthentication()
                         .getName()

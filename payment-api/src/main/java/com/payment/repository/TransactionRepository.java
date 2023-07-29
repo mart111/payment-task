@@ -11,8 +11,5 @@ import java.util.UUID;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-
-    List<Transaction> findAllByCustomerEmailOrderByCreatedAtAsc(String customerEmail);
-
     Optional<List<Transaction>> deleteByCreatedAtBefore(Instant instant);
 }
