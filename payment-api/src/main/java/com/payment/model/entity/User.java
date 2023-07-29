@@ -18,7 +18,8 @@ import java.util.Collection;
 @Inheritance
 @DiscriminatorColumn(name = "user_type")
 @DiscriminatorValue("user")
-@Table(name = "__user")
+@Table(name = "__user",
+indexes = @Index(name = "user_email_idx", columnList = "email"))
 public class User implements UserDetails {
 
     @Id

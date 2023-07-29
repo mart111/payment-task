@@ -6,6 +6,7 @@ import com.payment.model.request.UserRegistrationRequest;
 import com.payment.model.response.UserRegistrationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
@@ -19,9 +20,9 @@ public class AdminService {
 
     private final RegistrationService registrationService;
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ,
+            rollbackFor = Exception.class)
     public List<UserRegistrationResponse> importFromCsv(byte[] fileAsBytes) {
-
         final var reader = new InputStreamReader(new ByteArrayInputStream(fileAsBytes));
         final CsvToBean<UserRegistrationRequest> csvToBean = new CsvToBeanBuilder<UserRegistrationRequest>(reader)
                 .withType(UserRegistrationRequest.class)
