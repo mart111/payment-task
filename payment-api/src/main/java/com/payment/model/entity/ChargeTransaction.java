@@ -8,6 +8,10 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("CHARGE")
 public class ChargeTransaction extends Transaction {
 
+    public ChargeTransaction() {
+        super();
+    }
+
     @Override
     protected void setStatus() {
         transactionStatus = TransactionStatus.APPROVED;

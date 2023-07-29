@@ -2,7 +2,9 @@ package com.payment.service;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.payment.model.request.MerchantEditRequest;
 import com.payment.model.request.UserRegistrationRequest;
+import com.payment.model.response.MerchantResponse;
 import com.payment.model.response.UserRegistrationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import java.util.Optional;
 public class AdminService {
 
     private final RegistrationService registrationService;
+    private final MerchantService merchantService;
 
     @Transactional(isolation = Isolation.REPEATABLE_READ,
             rollbackFor = Exception.class)
@@ -33,5 +36,11 @@ public class AdminService {
                 .map(registrationService::registerAll)
                 .orElse(List.of());
 
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ,
+            rollbackFor = Exception.class)
+    public MerchantResponse updateMerchant(Long merchantId, MerchantEditRequest merchantEditRequest) {
+        return merchantService.updateMerchant(merchantId, merchantEditRequest);
     }
 }

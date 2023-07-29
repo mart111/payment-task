@@ -8,6 +8,9 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("REVERSE")
 public class ReverseTransaction extends Transaction {
 
+    public ReverseTransaction() {
+        super();
+    }
 
     @Override
     protected void setStatus() {

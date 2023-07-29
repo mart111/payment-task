@@ -22,13 +22,14 @@ public class RegistrationService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MerchantService merchantService;
 
     @Transactional(isolation = Isolation.REPEATABLE_READ,
             propagation = Propagation.REQUIRED,
             rollbackFor = Exception.class)
     public UserRegistrationResponse register(UserRegistrationRequest userRegistrationRequest) {
 
-        if (usernameAlreadyExists(userRegistrationRequest.getUsername())) {
+        if (merchantService.usernameAlreadyExists(userRegistrationRequest.getUsername())) {
             throw new DuplicateUsernameException(String.format("Username '%s' already exists",
                     userRegistrationRequest.getUsername()));
         }
@@ -49,10 +50,6 @@ public class RegistrationService {
                 .stream()
                 .map(this::register)
                 .toList();
-    }
-
-    private boolean usernameAlreadyExists(String username) {
-        return userRepository.existsByUsername(username);
     }
 
     private UserRegistrationResponse convertToUserRegistrationResponse(User user) {

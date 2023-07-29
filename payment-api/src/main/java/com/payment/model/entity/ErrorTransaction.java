@@ -8,6 +8,10 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("ERROR")
 public class ErrorTransaction extends Transaction {
 
+    public ErrorTransaction() {
+        super();
+    }
+
     @Override
     protected void setStatus() {
         transactionStatus = TransactionStatus.ERROR;
