@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RegistrationService {
@@ -26,16 +28,27 @@ public class RegistrationService {
             rollbackFor = Exception.class)
     public UserRegistrationResponse register(UserRegistrationRequest userRegistrationRequest) {
 
-        if (usernameAlreadyExists(userRegistrationRequest.username())) {
+        if (usernameAlreadyExists(userRegistrationRequest.getUsername())) {
             throw new DuplicateUsernameException(String.format("Username '%s' already exists",
-                    userRegistrationRequest.username()));
+                    userRegistrationRequest.getUsername()));
         }
 
         final var user = convertUserRegistrationRequest(userRegistrationRequest);
-        user.setPassword(passwordEncoder.encode(userRegistrationRequest.password()));
+        user.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
         user.setStatus(Status.ACTIVE);
         final var entity = userRepository.save(user);
         return convertToUserRegistrationResponse(entity);
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ,
+            rollbackFor = Exception.class)
+    public List<UserRegistrationResponse> registerAll(List<UserRegistrationRequest> registrationRequests) {
+
+        // prefer to use register method, as email uniqueness should be checked.
+        return registrationRequests
+                .stream()
+                .map(this::register)
+                .toList();
     }
 
     private boolean usernameAlreadyExists(String username) {
@@ -52,7 +65,7 @@ public class RegistrationService {
     }
 
     private User convertUserRegistrationRequest(UserRegistrationRequest registrationRequest) {
-        switch (registrationRequest.role()) {
+        switch (registrationRequest.getRole()) {
             case ADMIN -> {
                 return convertToUser(new User(), registrationRequest);
             }
@@ -64,11 +77,11 @@ public class RegistrationService {
     }
 
     private static User convertToUser(User user, UserRegistrationRequest registrationRequest) {
-        user.setName(registrationRequest.name());
-        user.setEmail(registrationRequest.username());
-        user.setPassword(registrationRequest.password());
-        user.setRole(registrationRequest.role());
-        user.setDescription(registrationRequest.description());
+        user.setName(registrationRequest.getName());
+        user.setEmail(registrationRequest.getUsername());
+        user.setPassword(registrationRequest.getPassword());
+        user.setRole(registrationRequest.getRole());
+        user.setDescription(registrationRequest.getDescription());
         return user;
     }
 }

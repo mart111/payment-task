@@ -6,6 +6,5 @@ public record MerchantResponse(
         String name,
         String email,
         BigDecimal transactionTotalSum,
-        String description
-) {
+        String description) {
 }
