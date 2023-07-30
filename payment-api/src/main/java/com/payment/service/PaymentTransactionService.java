@@ -1,11 +1,10 @@
 package com.payment.service;
 
-import com.payment.model.entity.AuthorizeTransaction;
-import com.payment.model.entity.ChargeTransaction;
-import com.payment.model.entity.Merchant;
-import com.payment.model.entity.Transaction;
+import com.payment.model.TransactionStatus;
+import com.payment.model.entity.*;
 import com.payment.model.request.AuthorizeTransactionRequest;
 import com.payment.model.request.ChargedTransactionRequest;
+import com.payment.model.request.ReverseTransactionRequest;
 import com.payment.model.response.TransactionListResponse;
 import com.payment.model.response.TransactionResponse;
 import com.payment.repository.MerchantRepository;
@@ -31,6 +30,10 @@ public class PaymentTransactionService {
     private final TransactionRepository transactionRepository;
     private final MerchantRepository merchantRepository;
 
+    public Optional<Transaction> findTransactionById(UUID uuid) {
+        return transactionRepository.findById(uuid);
+    }
+
     @Transactional(rollbackFor = Exception.class,
             isolation = Isolation.REPEATABLE_READ)
     public List<Transaction> removeTransactionsOlderThan(Instant instant) {
@@ -46,6 +49,20 @@ public class PaymentTransactionService {
         return Optional.of(transactionRepository.save(convertToAuthorizeTransaction(authorizeTransactionRequest)))
                 .map(this::convertToTransactionResponse)
                 .orElse(null);
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ,
+            rollbackFor = Exception.class)
+    public TransactionResponse reverseTransaction(ReverseTransactionRequest reverseTransactionRequest) {
+        final var transaction = findTransactionById(UUID.fromString(reverseTransactionRequest.getAuthorizedTransactionId()))
+                .orElse(null);
+        if (transaction == null) {
+            return null;
+        }
+        final var reversedTransaction = convertToReversedTransaction(reverseTransactionRequest);
+        final var revTransaction = transactionRepository.save(reversedTransaction);
+        transaction.setTransactionStatus(TransactionStatus.REVERSED);
+        return convertToTransactionResponse(revTransaction);
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ,
@@ -122,8 +139,14 @@ public class PaymentTransactionService {
     }
 
     private Transaction convertToChargedTransaction(ChargedTransactionRequest request) {
-        return transactionRepository.findById(UUID.fromString(request.getAuthorizedTransactionId()))
+        return findTransactionById(UUID.fromString(request.getAuthorizedTransactionId()))
                 .map(ChargeTransaction::wrap)
+                .orElse(null);
+    }
+
+    private Transaction convertToReversedTransaction(ReverseTransactionRequest request) {
+        return findTransactionById(UUID.fromString(request.getAuthorizedTransactionId()))
+                .map(ReverseTransaction::wrap)
                 .orElse(null);
     }
 }

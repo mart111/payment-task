@@ -26,7 +26,6 @@ public abstract class Transaction {
     protected BigDecimal amount;
 
     @Column(name = "status")
-    @Setter(AccessLevel.NONE)
     @Enumerated(EnumType.STRING)
     protected TransactionStatus transactionStatus;
 

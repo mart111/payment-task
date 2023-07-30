@@ -3,6 +3,7 @@ package com.payment.controller;
 import com.payment.model.GenericErrorResponse;
 import com.payment.model.request.AuthorizeTransactionRequest;
 import com.payment.model.request.ChargedTransactionRequest;
+import com.payment.model.request.ReverseTransactionRequest;
 import com.payment.service.PaymentTransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,15 @@ public class PaymentTransactionController {
                 ResponseEntity.ok(transactionResponse) :
                 ResponseEntity.badRequest()
                         .body(GenericErrorResponse.withError("Failed to authorize transaction."));
+    }
+
+    @PostMapping("/reverse")
+    private ResponseEntity<?> reverseTransaction(@RequestBody @Valid ReverseTransactionRequest reverseTransactionRequest) {
+        final var transactionResponse = paymentTransactionService.reverseTransaction(reverseTransactionRequest);
+        return transactionResponse != null ?
+                ResponseEntity.ok(transactionResponse) :
+                ResponseEntity.badRequest()
+                        .body(GenericErrorResponse.withError("Failed to reverse transaction."));
     }
 
     @PostMapping("/charge")

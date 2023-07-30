@@ -12,6 +12,16 @@ public class ReverseTransaction extends Transaction {
         super();
     }
 
+    public static ReverseTransaction wrap(Transaction toWrap) {
+        ReverseTransaction transaction = new ReverseTransaction();
+        transaction.setAmount(toWrap.amount);
+        transaction.setCustomerEmail(toWrap.customerEmail);
+        transaction.setCustomerPhone(toWrap.customerPhone);
+        transaction.setReferenceId(toWrap.getReferenceId());
+
+        return transaction;
+    }
+
     @Override
     protected void setStatus() {
         transactionStatus = TransactionStatus.REVERSED;
