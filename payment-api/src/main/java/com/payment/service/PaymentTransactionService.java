@@ -31,8 +31,8 @@ public class PaymentTransactionService {
     private final TransactionRepository transactionRepository;
     private final MerchantRepository merchantRepository;
 
-    public Optional<Transaction> findTransactionById(UUID uuid) {
-        return transactionRepository.findById(uuid);
+    public Transaction findTransactionById(UUID uuid) {
+        return transactionRepository.getReferenceById(uuid);
     }
 
     @Transactional(rollbackFor = Exception.class,
@@ -55,11 +55,8 @@ public class PaymentTransactionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ,
             rollbackFor = Exception.class)
     public TransactionResponse reverseTransaction(ReverseTransactionRequest reverseTransactionRequest) {
-        final var transaction = findTransactionById(UUID.fromString(reverseTransactionRequest.getAuthorizedTransactionId()))
-                .orElse(null);
-        if (transaction == null) {
-            return null;
-        }
+        final var transaction = findTransactionById(UUID.fromString(reverseTransactionRequest
+                .getAuthorizedTransactionId()));
         final var reversedTransaction = convertToReversedTransaction(reverseTransactionRequest);
         reversedTransaction.setReferenceId(transaction.getReferenceId());
         final var revTransaction = transactionRepository.save(reversedTransaction);
@@ -71,10 +68,6 @@ public class PaymentTransactionService {
             rollbackFor = Exception.class)
     public TransactionResponse chargeTransaction(ChargedTransactionRequest chargedTransactionRequest) {
         final var chargedTransaction = convertToChargedTransaction(chargedTransactionRequest);
-        if (chargedTransaction == null) {
-            log.warn("Authorized transaction not found by id: '{}'", chargedTransactionRequest.getAuthorizedTransactionId());
-            return null;
-        }
         chargedTransaction.setReferenceId(chargedTransactionRequest.getAuthorizedTransactionId());
         final var transaction = transactionRepository.save(chargedTransaction);
         final var updatedMerchant = merchantRepository.findById(chargedTransactionRequest.getMerchantId())
@@ -95,11 +88,8 @@ public class PaymentTransactionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ,
             rollbackFor = Exception.class)
     public TransactionResponse refundTransaction(RefundTransactionRequest refundTransactionRequest) {
-        final var chargedTransaction = findTransactionById(UUID.fromString(refundTransactionRequest.getChargedTransactionId()))
-                .orElse(null);
-        if (chargedTransaction == null) {
-            return null;
-        }
+        final var chargedTransaction =
+                findTransactionById(UUID.fromString(refundTransactionRequest.getChargedTransactionId()));
         final var merchant = merchantRepository.findById(chargedTransaction.getMerchantId())
                 .orElse(null);
         if (merchant == null) {
@@ -166,19 +156,19 @@ public class PaymentTransactionService {
     }
 
     private Transaction convertToChargedTransaction(ChargedTransactionRequest request) {
-        return findTransactionById(UUID.fromString(request.getAuthorizedTransactionId()))
+        return Optional.of(findTransactionById(UUID.fromString(request.getAuthorizedTransactionId())))
                 .map(ChargeTransaction::wrap)
                 .orElse(null);
     }
 
     private Transaction convertToReversedTransaction(ReverseTransactionRequest request) {
-        return findTransactionById(UUID.fromString(request.getAuthorizedTransactionId()))
+        return Optional.of(findTransactionById(UUID.fromString(request.getAuthorizedTransactionId())))
                 .map(ReverseTransaction::wrap)
                 .orElse(null);
     }
 
     private Transaction convertToRefundedTransaction(RefundTransactionRequest request) {
-        return findTransactionById(UUID.fromString(request.getChargedTransactionId()))
+        return Optional.of(findTransactionById(UUID.fromString(request.getChargedTransactionId())))
                 .map(RefundTransaction::wrap)
                 .orElse(null);
     }

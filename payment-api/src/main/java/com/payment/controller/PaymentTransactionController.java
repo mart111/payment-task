@@ -6,14 +6,15 @@ import com.payment.model.request.ChargedTransactionRequest;
 import com.payment.model.request.RefundTransactionRequest;
 import com.payment.model.request.ReverseTransactionRequest;
 import com.payment.service.PaymentTransactionService;
+import com.payment.validator.ChargeTransactionRequestValidator;
+import com.payment.validator.RefundTransactionRequestValidator;
+import com.payment.validator.ReverseTransactionRequestValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
@@ -22,6 +23,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentTransactionController {
 
     private final PaymentTransactionService paymentTransactionService;
+    private final ReverseTransactionRequestValidator reverseTransactionRequestValidator;
+    private final RefundTransactionRequestValidator refundTransactionRequestValidator;
+    private final ChargeTransactionRequestValidator chargeTransactionRequestValidator;
+
+    @InitBinder("reverseTransactionRequest")
+    public void reverseTransactionInitBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(reverseTransactionRequestValidator);
+    }
+
+    @InitBinder("refundTransactionRequest")
+    public void refundTransactionInitBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(refundTransactionRequestValidator);
+    }
+
+    @InitBinder("chargedTransactionRequest")
+    public void chargeTransactionInitBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(chargeTransactionRequestValidator);
+    }
 
     @PostMapping("/authorize")
     private ResponseEntity<?> submitTransaction(@RequestBody @Valid
@@ -55,7 +74,7 @@ public class PaymentTransactionController {
     }
 
     @PostMapping("/refund")
-    private ResponseEntity<?> chargeTransaction(@RequestBody @Valid
+    private ResponseEntity<?> refundTransaction(@RequestBody @Valid
                                                 RefundTransactionRequest refundTransactionRequest) {
 
         final var transactionResponse = paymentTransactionService.refundTransaction(refundTransactionRequest);
