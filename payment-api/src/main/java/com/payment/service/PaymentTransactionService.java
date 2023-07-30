@@ -4,6 +4,7 @@ import com.payment.model.TransactionStatus;
 import com.payment.model.entity.*;
 import com.payment.model.request.AuthorizeTransactionRequest;
 import com.payment.model.request.ChargedTransactionRequest;
+import com.payment.model.request.RefundTransactionRequest;
 import com.payment.model.request.ReverseTransactionRequest;
 import com.payment.model.response.TransactionListResponse;
 import com.payment.model.response.TransactionResponse;
@@ -60,6 +61,7 @@ public class PaymentTransactionService {
             return null;
         }
         final var reversedTransaction = convertToReversedTransaction(reverseTransactionRequest);
+        reversedTransaction.setReferenceId(transaction.getReferenceId());
         final var revTransaction = transactionRepository.save(reversedTransaction);
         transaction.setTransactionStatus(TransactionStatus.REVERSED);
         return convertToTransactionResponse(revTransaction);
@@ -73,8 +75,8 @@ public class PaymentTransactionService {
             log.warn("Authorized transaction not found by id: '{}'", chargedTransactionRequest.getAuthorizedTransactionId());
             return null;
         }
+        chargedTransaction.setReferenceId(chargedTransactionRequest.getAuthorizedTransactionId());
         final var transaction = transactionRepository.save(chargedTransaction);
-
         final var updatedMerchant = merchantRepository.findById(chargedTransactionRequest.getMerchantId())
                 .map(merchant -> {
                     merchant.addToTotalSum(transaction.getAmount());
@@ -86,8 +88,31 @@ public class PaymentTransactionService {
             log.warn("Merchant not found by id: '{}'", chargedTransactionRequest.getMerchantId());
             return null;
         }
-
+        transaction.setMerchantId(updatedMerchant.getId());
         return convertToTransactionResponse(transaction);
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ,
+            rollbackFor = Exception.class)
+    public TransactionResponse refundTransaction(RefundTransactionRequest refundTransactionRequest) {
+        final var chargedTransaction = findTransactionById(UUID.fromString(refundTransactionRequest.getChargedTransactionId()))
+                .orElse(null);
+        if (chargedTransaction == null) {
+            return null;
+        }
+        final var merchant = merchantRepository.findById(chargedTransaction.getMerchantId())
+                .orElse(null);
+        if (merchant == null) {
+            return null;
+        }
+
+        final var transaction = convertToRefundedTransaction(refundTransactionRequest);
+        transaction.setReferenceId(refundTransactionRequest.getChargedTransactionId());
+        final var refundTransaction = transactionRepository.save(transaction);
+        chargedTransaction.setTransactionStatus(TransactionStatus.REFUNDED);
+        merchant.subtractFromTotalSum(refundTransaction.getAmount());
+        merchant.addTransaction(refundTransaction);
+        return convertToTransactionResponse(refundTransaction);
     }
 
     public TransactionListResponse findAllTransactions(String merchantEmail) {
@@ -113,7 +138,8 @@ public class PaymentTransactionService {
                                 tx.getCustomerPhone(),
                                 tx.getCustomerEmail(),
                                 tx.getId().toString(),
-                                tx.getReferenceId()
+                                tx.getReferenceId(),
+                                tx.getMerchantId()
                         ))
                         .toList());
     }
@@ -125,7 +151,8 @@ public class PaymentTransactionService {
                 transaction.getCustomerPhone(),
                 transaction.getCustomerEmail(),
                 transaction.getId().toString(),
-                transaction.getReferenceId()
+                transaction.getReferenceId(),
+                transaction.getMerchantId()
         );
     }
 
@@ -147,6 +174,12 @@ public class PaymentTransactionService {
     private Transaction convertToReversedTransaction(ReverseTransactionRequest request) {
         return findTransactionById(UUID.fromString(request.getAuthorizedTransactionId()))
                 .map(ReverseTransaction::wrap)
+                .orElse(null);
+    }
+
+    private Transaction convertToRefundedTransaction(RefundTransactionRequest request) {
+        return findTransactionById(UUID.fromString(request.getChargedTransactionId()))
+                .map(RefundTransaction::wrap)
                 .orElse(null);
     }
 }

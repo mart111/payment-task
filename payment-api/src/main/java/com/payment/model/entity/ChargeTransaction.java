@@ -18,6 +18,7 @@ public class ChargeTransaction extends Transaction {
         transaction.setCustomerEmail(toWrap.customerEmail);
         transaction.setCustomerPhone(toWrap.customerPhone);
         transaction.setReferenceId(toWrap.getReferenceId());
+        transaction.setMerchantId(toWrap.getMerchantId());
 
         return transaction;
     }

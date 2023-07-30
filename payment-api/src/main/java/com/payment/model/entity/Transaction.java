@@ -35,6 +35,9 @@ public abstract class Transaction {
     @Column(name = "customer_phone")
     protected String customerPhone;
 
+    @Column(name = "merchant_id")
+    private Long merchantId;
+
     @Column(name = "creation_date", nullable = false)
     @Setter(AccessLevel.NONE)
     private Instant createdAt;

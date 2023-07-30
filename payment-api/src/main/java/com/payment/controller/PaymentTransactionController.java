@@ -3,6 +3,7 @@ package com.payment.controller;
 import com.payment.model.GenericErrorResponse;
 import com.payment.model.request.AuthorizeTransactionRequest;
 import com.payment.model.request.ChargedTransactionRequest;
+import com.payment.model.request.RefundTransactionRequest;
 import com.payment.model.request.ReverseTransactionRequest;
 import com.payment.service.PaymentTransactionService;
 import jakarta.validation.Valid;
@@ -53,4 +54,14 @@ public class PaymentTransactionController {
                         .body(GenericErrorResponse.withError("Failed to charge transaction."));
     }
 
+    @PostMapping("/refund")
+    private ResponseEntity<?> chargeTransaction(@RequestBody @Valid
+                                                RefundTransactionRequest refundTransactionRequest) {
+
+        final var transactionResponse = paymentTransactionService.refundTransaction(refundTransactionRequest);
+        return transactionResponse != null ?
+                ResponseEntity.ok(transactionResponse) :
+                ResponseEntity.badRequest()
+                        .body(GenericErrorResponse.withError("Failed to refund transaction."));
+    }
 }

@@ -9,8 +9,7 @@ public enum TransactionStatus {
     AUTHORIZED("authorized"),
     APPROVED("approved"),
     REVERSED("reversed"),
-    REFUNDED("refunded"),
-    ERROR("error");
+    REFUNDED("refunded");
 
     @Getter
     private final String statusName;

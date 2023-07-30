@@ -9,6 +9,7 @@ public record TransactionResponse(BigDecimal amount,
                                   String customerPhone,
                                   String customerEmail,
                                   String transactionId,
-                                  String referenceId) {
+                                  String referenceId,
+                                  Long merchantId) {
 
 }

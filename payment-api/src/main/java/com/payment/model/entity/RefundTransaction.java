@@ -12,6 +12,16 @@ public class RefundTransaction extends Transaction {
         super();
     }
 
+    public static RefundTransaction wrap(Transaction toWrap) {
+        RefundTransaction transaction = new RefundTransaction();
+        transaction.setAmount(toWrap.amount);
+        transaction.setCustomerEmail(toWrap.customerEmail);
+        transaction.setCustomerPhone(toWrap.customerPhone);
+        transaction.setReferenceId(toWrap.getReferenceId());
+
+        return transaction;
+    }
+
     @Override
     protected void setStatus() {
         transactionStatus = TransactionStatus.REFUNDED;
