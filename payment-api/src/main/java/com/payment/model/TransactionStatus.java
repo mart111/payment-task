@@ -8,7 +8,7 @@ public enum TransactionStatus {
 
     AUTHORIZED("authorized"),
     APPROVED("approved"),
-    REVERSED("charged"),
+    REVERSED("reversed"),
     REFUNDED("refunded"),
     ERROR("error");
 

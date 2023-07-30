@@ -12,6 +12,16 @@ public class ChargeTransaction extends Transaction {
         super();
     }
 
+    public static ChargeTransaction wrap(Transaction toWrap) {
+        ChargeTransaction transaction = new ChargeTransaction();
+        transaction.setAmount(toWrap.amount);
+        transaction.setCustomerEmail(toWrap.customerEmail);
+        transaction.setCustomerPhone(toWrap.customerPhone);
+        transaction.setReferenceId(toWrap.getReferenceId());
+
+        return transaction;
+    }
+
     @Override
     protected void setStatus() {
         transactionStatus = TransactionStatus.APPROVED;

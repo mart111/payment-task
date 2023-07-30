@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,8 +33,10 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/index").permitAll()
                         .requestMatchers("/api/v1/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/merchants").permitAll()
+                        .requestMatchers("/api/v1/transactions/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/v1/merchant/**").hasRole( "merchant")
+                        .requestMatchers("/api/v1/merchant/**").hasRole("merchant")
                         .requestMatchers("/api/v1/merchants/**").hasRole("admin")
                         .anyRequest()
                         .authenticated())

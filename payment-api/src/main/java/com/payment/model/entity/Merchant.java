@@ -14,18 +14,21 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("merchant")
+@NamedEntityGraph(name = "merchant_entity_graph",
+        attributeNodes = @NamedAttributeNode("transactions"))
 public class Merchant extends User {
 
     @Column(name = "total_transaction_sum")
+    @Setter(AccessLevel.NONE)
     private BigDecimal totalTransactionSum;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @Setter(AccessLevel.NONE)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "merchant_transaction",
             joinColumns = @JoinColumn(name = "user_id",
                     referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "transaction_id",
                     referencedColumnName = "transaction_id"))
-    @Setter(AccessLevel.NONE)
     private List<Transaction> transactions;
 
     public void addTransaction(Transaction transaction) {
@@ -33,5 +36,19 @@ public class Merchant extends User {
             this.transactions = new ArrayList<>();
         }
         this.transactions.add(transaction);
+    }
+
+    public void addToTotalSum(BigDecimal amount) {
+        if (this.totalTransactionSum == null) {
+            this.totalTransactionSum = BigDecimal.ZERO;
+        }
+        totalTransactionSum = this.totalTransactionSum.add(amount);
+    }
+
+    public void subtractFromTotalSum(BigDecimal amount) {
+        if (this.totalTransactionSum == null) {
+            this.totalTransactionSum = BigDecimal.ZERO;
+        }
+        totalTransactionSum = this.totalTransactionSum.subtract(amount);
     }
 }

@@ -8,7 +8,7 @@ public record TransactionResponse(BigDecimal amount,
                                   TransactionStatus status,
                                   String customerPhone,
                                   String customerEmail,
-                                  String uuid,
+                                  String transactionId,
                                   String referenceId) {
 
 }
