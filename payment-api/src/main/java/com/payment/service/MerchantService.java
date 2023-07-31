@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.springframework.util.StringUtils.hasText;
+
 @RequiredArgsConstructor
 @Service
 public class MerchantService {
@@ -82,11 +84,21 @@ public class MerchantService {
     }
 
     private Merchant updateUser(User actualUser, MerchantEditRequest merchantEditRequest) {
-        actualUser.setName(merchantEditRequest.name());
-        actualUser.setDescription(merchantEditRequest.description());
-        actualUser.setEmail(merchantEditRequest.username());
-        actualUser.setStatus(merchantEditRequest.status());
-        actualUser.setPassword(merchantEditRequest.password());
+        actualUser.setName(hasText(merchantEditRequest.name())
+                ? merchantEditRequest.name()
+                : actualUser.getName());
+        actualUser.setDescription(hasText(merchantEditRequest.description())
+                ? merchantEditRequest.description()
+                : actualUser.getDescription());
+        actualUser.setEmail(hasText(merchantEditRequest.username())
+                ? merchantEditRequest.username()
+                : actualUser.getEmail());
+        actualUser.setStatus(merchantEditRequest.status() != null
+                ? merchantEditRequest.status()
+                : actualUser.getStatus());
+        actualUser.setPassword(hasText(merchantEditRequest.password())
+                ? merchantEditRequest.password()
+                : actualUser.getPassword());
 
         return (Merchant) actualUser;
     }
