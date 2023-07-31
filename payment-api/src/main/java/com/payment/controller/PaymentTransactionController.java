@@ -43,7 +43,7 @@ public class PaymentTransactionController {
     }
 
     @PostMapping("/authorize")
-    private ResponseEntity<?> submitTransaction(@RequestBody @Valid
+    public ResponseEntity<?> submitTransaction(@RequestBody @Valid
                                                 AuthorizeTransactionRequest authorizeTransactionRequest) {
 
         final var transactionResponse = paymentTransactionService.authorizeTransaction(authorizeTransactionRequest);
@@ -54,7 +54,7 @@ public class PaymentTransactionController {
     }
 
     @PostMapping("/reverse")
-    private ResponseEntity<?> reverseTransaction(@RequestBody @Valid ReverseTransactionRequest reverseTransactionRequest) {
+    public ResponseEntity<?> reverseTransaction(@RequestBody @Valid ReverseTransactionRequest reverseTransactionRequest) {
         final var transactionResponse = paymentTransactionService.reverseTransaction(reverseTransactionRequest);
         return transactionResponse != null ?
                 ResponseEntity.ok(transactionResponse) :
@@ -63,7 +63,7 @@ public class PaymentTransactionController {
     }
 
     @PostMapping("/charge")
-    private ResponseEntity<?> chargeTransaction(@RequestBody @Valid
+    public ResponseEntity<?> chargeTransaction(@RequestBody @Valid
                                                 ChargedTransactionRequest chargedTransactionRequest) {
 
         final var transactionResponse = paymentTransactionService.chargeTransaction(chargedTransactionRequest);
@@ -74,7 +74,7 @@ public class PaymentTransactionController {
     }
 
     @PostMapping("/refund")
-    private ResponseEntity<?> refundTransaction(@RequestBody @Valid
+    public ResponseEntity<?> refundTransaction(@RequestBody @Valid
                                                 RefundTransactionRequest refundTransactionRequest) {
 
         final var transactionResponse = paymentTransactionService.refundTransaction(refundTransactionRequest);
