@@ -1,0 +1,623 @@
+openapi: 3.0.2
+
+info:
+  title: Payment API.
+  description: Rest API for payment service.
+  version: '1.0'
+
+
+
+tags:
+  - name: Admin API
+    description: Endpoints for admin to deal with merchants and transactions.
+  - name: Authentication API
+    description: Endpoints for authentication.
+  - name: Registration API
+    description: Endpoints for merchant regsitration
+  - name: Merchant API
+    description: Endpoints for logged in merchant.
+  - name: Transaction API
+    description: Endpoints for payment transaction management.
+
+paths:
+  '/api/v1/merchants':
+    get:
+      tags:
+        - Admin API
+      parameters:
+        - $ref: '#/components/parameters/auth'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantListResponse'
+        '403':
+          description: Forbidden, if "Authorization" header is missing
+        '401':
+          description: Unauthorized, if token is not valid.
+        '500':
+          description: Something went wrong.
+
+  '/api/v1/merchants/transactions':
+    get:
+      tags:
+        - Admin API
+      parameters:
+        - $ref: '#/components/parameters/auth'
+        - $ref: '#/components/parameters/merchantEmail'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionListResponse'
+        '403':
+          description: Forbidden, if "Authorization" header is missing
+        '401':
+          description: Unauthorized, if token is not valid.
+        '400':
+          $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Something went wrong.
+
+  '/api/v1/merchants/transactions/import':
+    post:
+      tags:
+        - Admin API
+      parameters:
+        - $ref: '#/components/parameters/auth'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FormDataRequest'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistrationResponse'
+        '403':
+          description: Forbidden, if "Authorization" header is missing
+        '401':
+          description: Unauthorized, if token is not valid.
+        '400':
+          $ref: '#/components/schemas/GenericErrorResponse'
+        '409':
+          description: Username already exists.
+        '500':
+          description: Something went wrong.
+
+  '/api/v1/merchants/{merchantId}':
+    put:
+      tags:
+        - Admin API
+      parameters:
+        - $ref: '#/components/parameters/auth'
+        - $ref: '#/components/parameters/merchantId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantEditRequest'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantResponse'
+        '403':
+          description: Forbidden, if "Authorization" header is missing
+        '401':
+          description: Unauthorized, if token is not valid.
+        '400':
+          $ref: '#/components/schemas/GenericErrorResponse'
+        '409':
+          description: Username already exists.
+        '500':
+          description: Something went wrong.
+
+    delete:
+      tags:
+        - Admin API
+      parameters:
+        - $ref: '#/components/parameters/auth'
+        - $ref: '#/components/parameters/merchantId'
+      responses:
+        '204':
+          description: OK
+        '403':
+          description: Forbidden, if "Authorization" header is missing
+        '401':
+          description: Unauthorized, if token is not valid.
+        '400':
+          $ref: '#/components/schemas/GenericErrorResponse'
+
+  '/api/v1/auth/login':
+    post:
+      tags:
+        - Authentication API
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          $ref: '#/components/schemas/LoginResponse'
+        '403':
+          description: Username/Password is not correct.
+        '500':
+          description: Something went wrong.
+
+  '/api/v1/register':
+    post:
+      tags:
+        - Registration API
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistrationResponse'
+        '409':
+          description: Username already exists.
+        '400':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Something went wrong.
+
+  '/api/v1/merchant/transactions':
+    get:
+      tags:
+        - Merchant API
+      parameters:
+        - $ref: '#/components/parameters/auth'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionListResponse'
+        '403':
+          description: Forbidden, if "Authorization" header is missing
+        '401':
+          description: Unauthorized, if token is not valid.
+        '500':
+          description: Something went wrong.
+
+  '/api/v1/transactions/authorize':
+    post:
+      tags:
+        - Transaction API
+      parameters:
+        - $ref: '#/components/parameters/auth'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizeTransactionRequest'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '403':
+          description: Forbidden, if "Authorization" header is missing
+        '401':
+          description: Unauthorized, if token is not valid.
+        '500':
+          description: Something went wrong.
+        '400':
+          description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+
+  '/api/v1/transactions/reverse':
+    post:
+      tags:
+        - Transaction API
+      parameters:
+        - $ref: '#/components/parameters/auth'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReverseTransactionRequest'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '403':
+          description: Forbidden, if "Authorization" header is missing
+        '401':
+          description: Unauthorized, if token is not valid.
+        '500':
+          description: Something went wrong.
+        '400':
+          description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  '/api/v1/transactions/charge':
+    post:
+      tags:
+        - Transaction API
+      parameters:
+        - $ref: '#/components/parameters/auth'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChargeTransactionRequest'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '403':
+          description: Forbidden, if "Authorization" header is missing
+        '401':
+          description: Unauthorized, if token is not valid.
+        '500':
+          description: Something went wrong.
+        '400':
+          description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  '/api/v1/transactions/refund':
+    post:
+      tags:
+        - Transaction API
+      parameters:
+        - $ref: '#/components/parameters/auth'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundTransactionRequest'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '403':
+          description: Forbidden, if "Authorization" header is missing
+        '401':
+          description: Unauthorized, if token is not valid.
+        '500':
+          description: Something went wrong.
+        '400':
+          description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+
+components:
+  schemas:
+
+    AuthorizeTransactionRequest:
+      type: object
+      properties:
+        customer_email:
+          type: string
+          required: true
+          description: Customer's email.
+        customer_phone:
+          type: string
+          description: Customer's phone number.
+          required: true
+          pattern: '\d{10}+'
+          example: '0870000000'
+        amount:
+          required: true
+          type: string
+          description: Transaction amount.
+          pattern: '\d+(?:\.\d+)?|\.\d+'
+          example: '10, 10.00'
+
+    ChargeTransactionRequest:
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          required: true
+          description: Merchant's Id.
+        authorized_transaction_id:
+          type: string
+          required: true
+          description: Authorized Transaction Id.
+
+    RefundTransactionRequest:
+      type: object
+      properties:
+        charged_transaction_id:
+          type: string
+          required: true
+          description: Charged Transaction Id.
+
+    ReverseTransactionRequest:
+      type: object
+      properties:
+        authorized_transaction_id:
+          type: string
+          required: true
+          description: Authorized Transaction Id.
+
+    ValidationError:
+      type: object
+      properties:
+        status:
+          description: HTTP Status
+          type: string
+        error:
+          type: string
+          description: General Description.
+        count:
+          type: integer
+          description: Error's count.
+        errors:
+          type: object
+          description: Errors per field.
+          additionalProperties:
+            properties:
+              fieldName:
+                type: string
+
+    FormDataRequest:
+      type: object
+      properties:
+        file:
+          description: CSV file.
+          type: string
+          format: binary
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          description: User's email.
+          required: true
+          type: string
+        password:
+          required: true
+          description: User's password.
+          type: string
+
+    UserRegistrationRequest:
+      type: object
+      properties:
+        name:
+          description: User's name.
+          required: true
+          type: string
+        username:
+          description: User's Email.
+          type: string
+        password:
+          type: string
+          required: true
+          description: User's password
+          minLength: 6
+        description:
+          type: string
+          description: User's Description.
+        role:
+          required: true
+          description: User's role
+          type: string
+          enum:
+            - admin
+            - merchant
+
+    LoginResponse:
+      type: object
+      properties:
+        name:
+          description: User's name.
+          type: string
+        email:
+          description: User's Email.
+          type: string
+        status:
+          description: User's status.
+          type: string
+          enum:
+            - active
+            - inactive
+        description:
+          type: string
+          description: User's Description.
+        role:
+          description: User's role
+          type: string
+          enum:
+            - admin
+            - merchant
+        authenticationToken:
+          type: object
+          properties:
+            authToken:
+              type: string
+              description: Bearer token
+            expiresIn:
+              type: string
+              format: date
+
+    MerchantEditRequest:
+      type: object
+      properties:
+        name:
+          description: Merchant's name
+          required: true
+          type: string
+        username:
+          description: Merchant's email
+          required: true
+          type: string
+        password:
+          type: string
+          description: Merchant's password
+          required: true
+          minLength: 6
+        status:
+          type: string
+          description: Merchant's status
+          enum:
+            - active
+            - inactive
+
+    UserRegistrationResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: User's name.
+        description:
+          type: string
+          description: User's description.
+        email:
+          type: string
+          description: User's email.
+        role:
+          type: string
+          description: User Role.
+          enum:
+            - merchant
+            - admin
+
+    GenericErrorResponse:
+      description: Error response.
+      type: object
+      properties:
+        error:
+          description: Error message.
+          type: string
+
+    MerchantResponse:
+      description: Merchant Response.
+      type: object
+      properties:
+        id:
+          description: Merchant Id.
+          type: integer
+        name:
+          description: Merchant name.
+          type: string
+        email:
+          description: Merchant Email.
+          type: string
+        status:
+          description: Merchant status.
+          type: string
+          enum:
+            - active
+            - inactive
+        transactionTotalSum:
+          description: Total transaction Sum.
+          type: number
+          format: double
+        description:
+          type: string
+          description: Merchant Description.
+
+    TransactionResponse:
+      description: Transaction Response.
+      type: object
+      properties:
+        transactionId:
+          description: Transaction Id.
+          type: integer
+        merchantId:
+          description: Merchant Id.
+          type: string
+        referenceId:
+          description: Reference Id.
+          type: string
+        amount:
+          description: Transaction's amount.
+          type: number
+          format: double
+        status:
+          description: Transaction status.
+          type: string
+          enum:
+            - authorized
+            - approved
+            - refunded
+            - reversed
+        customerPhone:
+          description: Customer phone..
+          type: string
+        customerEmail:
+          type: string
+          description: Customer email.
+
+    MerchantListResponse:
+      description: Merchant List Response.
+      type: object
+      properties:
+        merchantResponseList:
+          allOf:
+            - $ref: '#/components/schemas/MerchantResponse'
+            - type: object
+
+    TransactionListResponse:
+      description: Merchant's transactions response.
+      type: object
+      properties:
+        transactionListResponse:
+          allOf:
+            - $ref: '#/components/schemas/TransactionResponse'
+            - type: object
+
+  parameters:
+    auth:
+      name: Authorization
+      in: header
+      example: Bearer <token>
+      required: true
+    merchantEmail:
+      name: Merchant's Email
+      required: true
+      in: query
+      example: ?merchantEmail=<merchant-email>
+    merchantId:
+      name: Merchant's Id.
+      in: path
+      required: true

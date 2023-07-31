@@ -11,14 +11,14 @@ import lombok.Setter;
 @Data
 public class AuthorizeTransactionRequest {
 
-    @NotNull(message = "This field ios required.")
+    @NotNull(message = "This field is required.")
     @Email(message = "Not a valid e-mail address.")
     @JsonProperty("customer_email")
     @Setter(AccessLevel.NONE)
     private String customerEmail;
 
     @NotNull(message = "Customer phone should not be null.")
-    @Pattern(regexp = "^\\d{10}$")
+    @Pattern(regexp = "^\\d{10}+$")
     @JsonProperty("customer_phone")
     @Setter(AccessLevel.NONE)
     private String customerPhone;
