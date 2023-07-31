@@ -13,6 +13,6 @@ public class MerchantRemovalExceptionHandler {
     @ExceptionHandler(MerchantNotEligibleForRemovalException.class)
     public ResponseEntity<GenericErrorResponse> handle() {
         return ResponseEntity.badRequest()
-                .body(GenericErrorResponse.withError("Merchant can't be deleted, due to related payment history"));
+                .body(GenericErrorResponse.withError("Merchant can't be deleted, due to related payment history."));
     }
 }
