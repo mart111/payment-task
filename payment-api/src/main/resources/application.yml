@@ -2,13 +2,33 @@ server:
   port: 8081
 
 spring:
+  sql:
+    init:
+      mode: always # initiate tables on container start-up
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://db:3306/${MYSQL_DATABASE:payment}?useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: ${MYSQL_ROOT_PASSWORD}
+    password: ${MYSQL_ROOT_PASSWORD:root}
 
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+
+  task:
+    scheduling:
+      pool:
+        size: 2
+
+app:
+  scheduler:
+    cron: 0 0 * * * * # every hour
+
+jwt:
+  secretKey: g54GzdnRhLke/K08fXIA4NpJnj4vNiRMVv7d1Pm3aIYzuF43BXF3/KB7iL7UazdQ
