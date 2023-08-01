@@ -10,6 +10,7 @@ import com.payment.repository.MerchantRepository;
 import com.payment.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,7 @@ public class MerchantService {
 
     private final MerchantRepository merchantRepository;
     private final UserRepository userRepository;
-    private final PaymentTransactionService paymentTransactionService;
+    private final PasswordEncoder passwordEncoder;
 
     public MerchantListResponse getAllMerchants() {
         return Optional.of(merchantRepository.findAll())
@@ -97,8 +98,8 @@ public class MerchantService {
                 ? merchantEditRequest.status()
                 : actualUser.getStatus());
         actualUser.setPassword(hasText(merchantEditRequest.password())
-                ? merchantEditRequest.password()
-                : actualUser.getPassword());
+                ? passwordEncoder.encode(merchantEditRequest.password())
+                : passwordEncoder.encode(actualUser.getPassword()));
 
         return (Merchant) actualUser;
     }
