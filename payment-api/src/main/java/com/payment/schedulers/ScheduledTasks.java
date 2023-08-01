@@ -19,7 +19,7 @@ public class ScheduledTasks {
 
     private final PaymentTransactionService paymentTransactionService;
 
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "${app.scheduler.cron}")
     @Async
     public void removeTransactionsOlderThanOneHour() {
         log.debug("Job: 'removeTransactionsOlderThanOneHour' started.");

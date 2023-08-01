@@ -5,10 +5,12 @@ import com.payment.model.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class UserRegistrationRequest {
 
@@ -27,6 +29,7 @@ public class UserRegistrationRequest {
     private Role role;
 
     @NotNull(message = "This field is required.")
+    @Size(min = 3, message = "Name should contain at least 3 characters.")
     @CsvBindByName(required = true)
     private String name;
 

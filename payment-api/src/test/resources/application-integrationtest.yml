@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  sql:
+    init:
+      mode: always
+
+jwt:
+  secretKey: g54GzdnRhLke/K08fXIA4NpJnj4vNiRMVv7d1Pm3aIYzuF43BXF3/KB7iL7UazdQ

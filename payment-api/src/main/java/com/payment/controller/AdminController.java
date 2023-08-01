@@ -65,7 +65,7 @@ public class AdminController {
         return nonNull(merchantResponse) ?
                 ResponseEntity.ok(merchantResponse) :
                 ResponseEntity.badRequest()
-                        .body(GenericErrorResponse.withError(String.format("Failed to update merchant with email '%s'",
+                        .body(GenericErrorResponse.withError(String.format("Failed to update merchant with ID '%s'",
                                 merchantEditRequest.username())));
     }
 

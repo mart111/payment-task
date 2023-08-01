@@ -5,7 +5,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.ObjectError;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,7 +26,7 @@ public class ValidationExceptionHandler {
         validationError.setError("Validation failed.");
 
         final var pairs = ex.getBindingResult()
-                .getAllErrors()
+                .getFieldErrors()
                 .stream()
                 .map(ValidationExceptionHandler::constructPair)
                 .collect(toMap(Pair::getLeft, Pair::getRight));
@@ -36,9 +36,9 @@ public class ValidationExceptionHandler {
 
     }
 
-    private static ImmutablePair<String, Object> constructPair(ObjectError objectError) {
-        return new ImmutablePair<>(objectError.getObjectName(),
-                hasText(objectError.getDefaultMessage()) ? objectError.getDefaultMessage()
-                        : objectError.getCode());
+    private static Pair<String, Object> constructPair(FieldError fieldError) {
+        return new ImmutablePair<>(fieldError.getField(),
+                hasText(fieldError.getDefaultMessage()) ? fieldError.getDefaultMessage()
+                        : fieldError.getCode());
     }
 }

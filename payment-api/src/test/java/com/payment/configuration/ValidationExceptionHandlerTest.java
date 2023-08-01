@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,8 +27,8 @@ class ValidationExceptionHandlerTest {
         BindingResult bindingResult =
                 new BindException(new Object(), "objectName");
 
-        bindingResult.addError(new ObjectError("username", "not a valid username"));
-        bindingResult.addError(new ObjectError("password", "Password should contain at least 6 characters."));
+        bindingResult.addError(new FieldError("objectName","username", "not a valid username"));
+        bindingResult.addError(new FieldError("objectName", "password", "Password should contain at least 6 characters."));
 
         when(methodArgumentNotValidException.getBindingResult())
                 .thenReturn(bindingResult);
