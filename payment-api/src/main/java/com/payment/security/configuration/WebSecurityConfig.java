@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -41,6 +42,10 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/merchants/**").hasRole("admin")
                         .anyRequest()
                         .authenticated())
+                .exceptionHandling(configurer ->
+                        configurer.authenticationEntryPoint(
+                                authenticationEntryPoint()
+                        ))
                 .sessionManagement(sessionManagementConfigurer ->
                         sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -55,6 +60,11 @@ public class WebSecurityConfig {
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(bCryptPasswordEncoder());
         return provider;
+    }
+
+    @Bean
+    AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) -> response.setStatus(401);
     }
 
     @Bean
