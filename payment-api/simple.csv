@@ -1,0 +1,4 @@
+name,email,password,description,role
+
+Martin,martink@mail.ru,Martin1998,Test merchant Description,merchant
+Martin,martink@gmail.ru,Martin1998,Test admin Description,admin

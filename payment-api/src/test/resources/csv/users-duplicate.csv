@@ -1,0 +1,4 @@
+name,email,password,description,role
+
+Merchant1,merchant1@gmail.com,Merchant123,Test merchant Description,merchant
+Merchant2,merchant1@gmail.com,Merchant123,Test merchant Description,merchant
