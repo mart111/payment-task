@@ -32,7 +32,7 @@ public class MerchantControllerIT extends BaseIntegrationTest {
                 .status(HttpStatus.OK)
                 .body("transactionResponseList.size()", equalTo(1))
                 .body("transactionResponseList[0].customerEmail", equalTo("test-customer@gmail.com"))
-                .body("transactionResponseList[0].transactionStatus",
+                .body("transactionResponseList[0].status",
                         equalToIgnoringCase(TransactionStatus.AUTHORIZED.getStatusName()));
 
     }
