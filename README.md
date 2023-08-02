@@ -29,3 +29,8 @@ Then run.
 ## API documentation
 
 API documentation available under `./swagger` folder.
+
+## NOTICE:
+
+Creation of /authorized/charged/refunded/reversed can be done via attached postman collection
+``Transactions.postman_collection.json``
