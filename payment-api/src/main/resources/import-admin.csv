@@ -1,0 +1,3 @@
+name,email,password,description,role
+
+Admin,admin@emerchantpay.com,Admin123,Default Admin,admin
