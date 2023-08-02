@@ -1,0 +1,100 @@
+{
+	"info": {
+		"_postman_id": "0357342a-302e-49cc-8136-9ed014fe82cb",
+		"name": "Transactions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "26653792"
+	},
+	"item": [
+		{
+			"name": "Create Merchant",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"merchant@test.com\",\r\n    \"password\": \"Merchant123\",\r\n    \"name\": \"Merchant\",\r\n    \"role\": \"merchant\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8081/api/v1/register"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Authorized Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"customer_email\" : \"demo-customer@mail.ru\",\r\n    \"customer_phone\" : \"0878787870\",\r\n    \"amount\" : \"14.00\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8081/api/v1/transactions/authorize"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Charge Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"merchant_id\" : 1,\r\n    \"authorized_transaction_id\": \"b7a6858e-2e6f-4c11-b7c4-86cab93160d6\" // put here newly created authorized transaction ID\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8081/api/v1/transactions/charge"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Refund Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"charged_transaction_id\": \"f1d3d370-1326-4250-b147-f375daedb180\" // put here charged transaction ID\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8081/api/v1/transactions/refund"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Reverse Transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"authorized_transaction_id\": \"b7a6858e-2e6f-4c11-b7c4-86cab93160d6\" // put here authorized transaction ID\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8081/api/v1/transactions/reverse"
+			},
+			"response": []
+		}
+	]
+}
